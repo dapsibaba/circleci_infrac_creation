@@ -5,15 +5,18 @@ jobs:
   create_infrastructure:
     docker:
       - image: amazon/aws-cli
+
     steps:
       - checkout
       - run:
           name: Create Cloudformation Stack
           command: |
+            aws 
             aws cloudformation deploy --template-file template.yml \
             --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} --region us-east-1
 
 workflows:
   myWorkflow:
     jobs:
-      - create_infrastructure
+      - create_infrastructure:
+          context: "AWS variables"
