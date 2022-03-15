@@ -1,6 +1,6 @@
 - name: Exercise for setting up a web server in an EC
-  hosts: all
-  user: ubuntu
+  hosts: all # from inventory.txt
+  user: ubuntu #default user name for the AMI that you used to launch your instance: for ubuntu AMI it is ubuntu. check this link:https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
   become: true
   become_method: sudo
   become_user: root
