@@ -62,7 +62,7 @@ jobs:
 
   smoke_test:
     docker:
-      - image: alpine:latest
+      - image: amazon/aws-cli
     steps:
       - run:
           name: Test job # success in circleci jobs exits with a 0 and failure with a non-zero value
