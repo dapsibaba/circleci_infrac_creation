@@ -77,6 +77,4 @@ workflows:
           context: "AWS variables"    
       # - configure_infrastructure:
       #     context: "AWS variables"  
-      - smoke_test: 
-          requires:
-            - create_infrastructure
+      - smoke_test
