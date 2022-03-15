@@ -1,43 +1,82 @@
 version: 2.1
+commands:
+   # Exercise - Rollback
+  destroy_environment:
+    steps:
+       - run:
+          name: Destroy environment
+           # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable 
+           # ${CIRCLE_WORKFLOW_ID:0:5} takes the first 5 chars of the variable CIRCLE_CI_WORKFLOW_ID 
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
 jobs:
-  # create_infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-      
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Create Cloudformation Stack
-  #         command: |
-  #           aws cloudformation deploy --template-file template.yml \
-  #           --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} --region us-east-1
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy --template-file template.yml \
+            --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} --region us-east-1
 
 
     # Exercise: Config and Deployment
-  configure_infrastructure: 
-    docker:
-      - image: python:3.7-alpine3.11 
-    steps:
-      - checkout
-      - add_ssh_keys:
-              # You can get this ID in the section where you registered the SSH Key
-              fingerprints: ["1a:bf:59:60:71:6b:33:32:68:17:47:28:38:81:88:25"] 
-      - run:
-          name: Install Ansible
-          command: |
-            apk add --update ansible
-      - run:
-          name: Run Playbook and Configure server
-          command: |
-            ansible-playbook -i inventory.txt main-remote.yml
+  # configure_infrastructure: 
+  #   docker:
+  #     - image: python:3.7-alpine3.11 
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #             # You can get this ID in the section where you registered the SSH Key
+  #             fingerprints: ["1a:bf:59:60:71:6b:33:32:68:17:47:28:38:81:88:25"] 
+  #     - run:
+  #         name: Install Ansible
+  #         command: |
+  #           apk add --update ansible
+  #     - run:
+  #         name: Run Playbook and Configure server
+  #         command: |
+  #           ansible-playbook -i inventory.txt main-remote.yml
 
+  # smoke_test:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run: apk add --update curl # this will install curl
+  #     - run:
+  #         name: smoke test # success in circleci jobs exits with a 0 and failure with a non-zero value
+  #         command: |
+  #           URL="https://blog.udacity.com/"
+  #           #Test if website exists
+  #           if curl -s --head ${URL}
+  #           then
+  #             return 0
+  #           else 
+  #             return 1
+  #           fi
+
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run:
+          name: Test job # success in circleci jobs exits with a 0 and failure with a non-zero value
+          # Fail the job intentionally to simulate an error
+          command: return 1
+      - destroy_environment
 
 workflows:
   myWorkflow:
     jobs:
-      # - create_infrastructure:
-      #     context: "AWS variables"    
-      - configure_infrastructure:
-          context: "AWS variables"  
+      - create_infrastructure:
+          context: "AWS variables"    
+      # - configure_infrastructure:
+      #     context: "AWS variables"  
+      - smoke_test: 
+          requires:
+            - create_infrastructure
