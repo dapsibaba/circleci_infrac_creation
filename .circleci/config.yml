@@ -73,7 +73,7 @@ jobs:
 workflows:
   myWorkflow:
     jobs:
-      - create_infrastructure:
+      - create_infrastructure
           # context: "AWS variables"    
       # - configure_infrastructure:
       #     context: "AWS variables"  
