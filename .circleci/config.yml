@@ -80,3 +80,4 @@ workflows:
       - smoke_test:
           requires: 
             - create_infrastructure
+          context: "AWS variables" 
