@@ -1,4 +1,4 @@
-# circleci_infrac_creation
+#### Infrastructure creation with circleci
 Creating some infrastructure - an EC2 instance and the associated security group.<br>
 Step1: set up a CircleCI project<br>
 Step2: set up Environment Variables in CircleCI (AWS_ACCESS_KEY_ID, AWS_DEFAULT_REGION, AWS_SECRET_ACCESS_KEY)<br>
